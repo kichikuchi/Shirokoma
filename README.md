@@ -48,7 +48,7 @@ print(result)
 
 ## Installation
 
-* Add github `"kichikuchi/Shirokoma"`
+* Add `github "kichikuchi/Shirokoma"`
 * Run `carthage update`
 
 ## License
