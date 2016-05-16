@@ -47,9 +47,17 @@ print(result)
 * iOS 8.0 or later
 
 ## Installation
-
+### Carthage
 * Add `github "kichikuchi/Shirokoma"`
 * Run `carthage update`
+
+### CocoaPods
+* Add the followings to your Podfile
+```
+use_frameworks!
+pod 'Shirokoma'
+```
+* Run `pod install`
 
 ## License
 
