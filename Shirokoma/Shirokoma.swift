@@ -13,17 +13,17 @@ public protocol Shirokoma {
 }
 
 public extension Shirokoma {
-    public func abTest( completion : (Condition -> Void)?) {
+    public func abTest( completion : ((Condition) -> Void)?) {
         completion?(self.condition())
     }
     
     public func condition() -> Condition {
-        let ud = NSUserDefaults.standardUserDefaults()
-        let userDefaultsKey = ShirokomaConditionKey + String(Self)
-        let condition = ud.objectForKey(userDefaultsKey) as? UserDefaultsDictionary
+        let ud = UserDefaults.standard
+        let userDefaultsKey = ShirokomaConditionKey + String(describing: Self.self)
+        let condition = ud.object(forKey: userDefaultsKey) as? UserDefaultsDictionary
         
         if let condition = condition {
-            return deserializeDictionary(condition)
+            return deserializeDictionary(dictionary: condition)
         } else {
             return selectCondition()
         }
@@ -34,8 +34,8 @@ extension Shirokoma {
     
     func serializeTuple(tuple: Condition) -> UserDefaultsDictionary {
         return [
-            first : tuple.condition,
-            second : tuple.percentage
+            first : tuple.condition as AnyObject,
+            second : tuple.percentage as AnyObject
         ]
     }
     
@@ -49,7 +49,7 @@ extension Shirokoma {
     func selectCondition() -> Condition {
         
         let percentages = conditions.map { $0.percentage }
-        let sum = percentages.reduce(0, combine: +)
+        let sum = percentages.reduce(0) { $0 + $1 }
         let rand = Int(arc4random_uniform(UInt32(sum)) + 1)
         
         var splits: Array<Int> = []
@@ -60,7 +60,7 @@ extension Shirokoma {
             splits.append(currentValue)
         }
         
-        let indexNum = splits.enumerate().filter { rand <= $0.element }.first!.index
+        let indexNum = splits.enumerated().filter { rand <= $0.element }.first!.offset
         let condition = conditions[indexNum]
         
         saveCondition(condition)
@@ -68,11 +68,11 @@ extension Shirokoma {
         return condition
     }
     
-    func saveCondition(condition: Condition) {
-        let userDefaults = NSUserDefaults.standardUserDefaults()
-        let userDefaultsKey = ShirokomaConditionKey + String(Self)
-        let conditionDictionary = serializeTuple(condition)
-        userDefaults.setObject(conditionDictionary, forKey: userDefaultsKey)
+    func saveCondition(_ condition: Condition) {
+        let userDefaults = UserDefaults.standard
+        let userDefaultsKey = ShirokomaConditionKey + String(describing: Self.self)
+        let conditionDictionary = serializeTuple(tuple: condition)
+        userDefaults.set(conditionDictionary, forKey: userDefaultsKey)
         userDefaults.synchronize()
     }
 }
